@@ -6,7 +6,11 @@ name: Sincronizar apoiantes (Trello)
 #
 # Secrets necessários (Settings → Secrets and variables → Actions):
 #   TRELLO_KEY, TRELLO_TOKEN, TRELLO_BOARD_ID
-# Variável opcional: SITE_URL (por omissão https://apaefao.pt)
+# Variável necessária (Settings → Secrets and variables → Actions → Variables):
+#   SITE_URL — o endereço público do site, usado para confirmar a publicação.
+#              Em produção: https://apaefao.pt
+#              Num repositório de teste: https://<utilizador>.github.io/<repo>
+#              (sem barra no fim). Se faltar, usa https://apaefao.pt.
 
 on:
   # Uma vez por dia (para não gastar minutos do GitHub Actions). Pode correr-se
@@ -75,7 +79,9 @@ jobs:
           TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
           TRELLO_BOARD_ID: ${{ secrets.TRELLO_BOARD_ID }}
           SITE_URL: ${{ vars.SITE_URL || 'https://apaefao.pt' }}
-        run: node scripts/sincronizar-apoiantes.mjs --confirmar
+        run: |
+          echo "A confirmar em: $SITE_URL"
+          node scripts/sincronizar-apoiantes.mjs --confirmar
 
       - name: Avisar sobre cartões com problemas
         if: steps.sync.outputs.problemas != '0'
