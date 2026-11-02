@@ -1,11 +1,22 @@
 [
  {
+  "nome": "Teste",
+  "descricao": "Descrição",
+  "website": "",
+  "categoria": "Instituição",
+  "destaque": false,
+  "ordem": 0,
+  "tipo": "instituicao",
+  "logo": "",
+  "publicar": true
+ },
+ {
   "nome": "CMT – Casa Penetra",
   "descricao": "",
   "website": "https://www.google.com/maps/search/?api=1&query=CMT%20%E2%80%93%20Casa%20Penetra%2C%20F%C3%A3o&query_place_id=ChIJhyrpzltLJA0R527XGaX_bDQ",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 0,
+  "ordem": 1,
   "tipo": "loja",
   "logo": "img/apoiantes/cmt-casa-penetra.jpg",
   "publicar": true
@@ -16,7 +27,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Florista%20Bela%20Arte%2C%20F%C3%A3o&query_place_id=ChIJ5_pRWKFLJA0RXh2yfT-gSRE",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 1,
+  "ordem": 2,
   "tipo": "loja",
   "logo": "img/apoiantes/florista-bela-arte.jpg",
   "publicar": true
@@ -27,7 +38,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Chal%C3%A9%20Tapas%20Bar%2C%20F%C3%A3o&query_place_id=ChIJfZTGNedLJA0R-4gKwToNLPM",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 2,
+  "ordem": 3,
   "tipo": "loja",
   "logo": "img/apoiantes/chale-tapas-bar.jpg",
   "publicar": true
@@ -38,7 +49,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=OfirDent%2C%20F%C3%A3o&query_place_id=ChIJi2J7VOdLJA0RbtNWZtExtVs",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 3,
+  "ordem": 4,
   "tipo": "loja",
   "logo": "",
   "publicar": true
@@ -49,7 +60,7 @@
   "website": "",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 4,
+  "ordem": 5,
   "tipo": "loja",
   "logo": "",
   "publicar": true
@@ -60,7 +71,7 @@
   "website": "",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 5,
+  "ordem": 6,
   "tipo": "loja",
   "logo": "",
   "publicar": true
@@ -71,7 +82,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Supermercado%20e%20Talho%20Ramalh%C3%A3o%2C%20F%C3%A3o&query_place_id=ChIJO1xgYd5LJA0RHo5goycyXEU",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 6,
+  "ordem": 7,
   "tipo": "loja",
   "logo": "img/apoiantes/supermercado-e-talho-ramalhao.jpg",
   "publicar": true
@@ -82,7 +93,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Restaurante%20Paladar%2C%20F%C3%A3o&query_place_id=ChIJl558D_VLJA0RBaTuS1vDRkI",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 7,
+  "ordem": 8,
   "tipo": "loja",
   "logo": "img/apoiantes/restaurante-paladar.jpg",
   "publicar": true
@@ -93,7 +104,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Rituais%20de%20Beleza%2C%20F%C3%A3o&query_place_id=ChIJ1wUav95LJA0R58wAuYgrJ3U",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 8,
+  "ordem": 9,
   "tipo": "loja",
   "logo": "img/apoiantes/rituais-de-beleza.jpg",
   "publicar": true
@@ -104,7 +115,7 @@
   "website": "https://www.instagram.com/doce_e_granulado/",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 9,
+  "ordem": 10,
   "tipo": "loja",
   "logo": "img/apoiantes/doce-e-granulado.jpg",
   "publicar": true
@@ -115,7 +126,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Bica%20d%27Ofir%2C%20F%C3%A3o&query_place_id=ChIJhUkax19LJA0RO9oeZrZFQQM",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 10,
+  "ordem": 11,
   "tipo": "loja",
   "logo": "img/apoiantes/bica-d-ofir.jpg",
   "publicar": true
@@ -126,7 +137,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=ALEC%20Garments%2C%20V%C3%A1rzea&query_place_id=ChIJj77JCF60JQ0R30sIREtMsUc",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 11,
+  "ordem": 12,
   "tipo": "loja",
   "logo": "img/apoiantes/alec.jpg",
   "publicar": true
@@ -137,7 +148,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Cl%C3%A1udia%20Maria%2C%20F%C3%A3o&query_place_id=ChIJp2OOUvNLJA0RY5KEbYCwqV4",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 12,
+  "ordem": 13,
   "tipo": "loja",
   "logo": "img/apoiantes/restaurante-claudia-maria.jpg",
   "publicar": true
@@ -148,7 +159,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Skills%20Training%20Centre%2C%20Esposende&query_place_id=ChIJHw1NspFLJA0RqzjYCIOXivc",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 13,
+  "ordem": 14,
   "tipo": "loja",
   "logo": "img/apoiantes/skills-training-centre.jpg",
   "publicar": true
@@ -159,7 +170,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Fitinhas%20de%20Cetim%2C%20F%C3%A3o",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 14,
+  "ordem": 15,
   "tipo": "loja",
   "logo": "",
   "publicar": true
@@ -170,7 +181,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Ana%20Lopes%20Sa%C3%BAde%20e%20Bem%20Estar%2C%20Perelhal&query_place_id=ChIJp3hUjEJNJA0RsoS05SdNdbY",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 15,
+  "ordem": 16,
   "tipo": "loja",
   "logo": "img/apoiantes/ana-lopes-saude-e-bem-estar.jpg",
   "publicar": true
@@ -181,7 +192,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Fanum%20Gabinete%20Est%C3%A9tica%2C%20F%C3%A3o&query_place_id=ChIJmXKl49xLJA0R1v70oXZ4pX0",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 16,
+  "ordem": 17,
   "tipo": "loja",
   "logo": "img/apoiantes/fanum-estetica.jpg",
   "publicar": true
@@ -192,7 +203,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Xalo%20Doce%2C%20Esposende",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 17,
+  "ordem": 18,
   "tipo": "loja",
   "logo": "",
   "publicar": true
@@ -203,7 +214,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Tio%20Barbas%20Barbearia%2C%20F%C3%A3o&query_place_id=ChIJUxiF8z9LJA0RH2U0ddvN7pc",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 18,
+  "ordem": 19,
   "tipo": "loja",
   "logo": "img/apoiantes/tio-barbas-barbearia.jpg",
   "publicar": true
@@ -214,7 +225,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Anibal%20Cabeleireiros%2C%20F%C3%A3o&query_place_id=ChIJ8VjSQudLJA0R-4E_5gSYLsY",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 19,
+  "ordem": 20,
   "tipo": "loja",
   "logo": "img/apoiantes/anibal-cabeleireiros.jpg",
   "publicar": true
@@ -225,7 +236,7 @@
   "website": "https://www.google.com/maps/search/?api=1&query=Monkey%20Park%20Esposende&query_place_id=ChIJY6flw0VLJA0R5wReA43iQXI",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 20,
+  "ordem": 21,
   "tipo": "loja",
   "logo": "",
   "publicar": true
@@ -236,7 +247,7 @@
   "website": "https://www.b7computer.pt/",
   "categoria": "Empresa",
   "destaque": false,
-  "ordem": 21,
+  "ordem": 22,
   "tipo": "loja",
   "logo": "",
   "publicar": true
