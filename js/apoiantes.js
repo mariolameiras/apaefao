@@ -10,7 +10,7 @@
 const ICONES = {
   florista: "🌸", restaurante: "🍽️", cafe: "☕", pastelaria: "🍰", dentista: "🦷", beleza: "💆",
   supermercado: "🛒", loja: "🧴", roupa: "👕", particular: "💛",
-  desporto: "🏋️", barbearia: "💈", cabeleireiro: "💇", diversao: "🐒",
+  desporto: "🏋️", barbearia: "💈", cabeleireiro: "💇", diversao: "🐒", tecnologia: "📱",
   instituicao: "🏛️", associacao: "🤝", outro: "💛",
 };
 

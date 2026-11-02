@@ -229,5 +229,16 @@
   "tipo": "loja",
   "logo": "",
   "publicar": true
+ },
+ {
+  "nome": "B7 Computer",
+  "descricao": "",
+  "website": "https://www.b7computer.pt/",
+  "categoria": "Empresa",
+  "destaque": false,
+  "ordem": 21,
+  "tipo": "loja",
+  "logo": "",
+  "publicar": true
  }
 ]
