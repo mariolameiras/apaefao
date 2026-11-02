@@ -6,7 +6,7 @@ A lista de apoiantes vem de um quadro do Trello e é sincronizada por GitHub Act
 
 ```
 Trello (Aprovados + Publicados)
-   └─ workflow "Sincronizar apoiantes" (cada 5 min)
+   └─ workflow "Sincronizar apoiantes" (1× por dia)
         ├─ scripts/sincronizar-apoiantes.mjs → data/apoiantes.json + img/apoiantes/
         ├─ commit em main (GITHUB_TOKEN)
         ├─ dispara "Publicar site" (workflow_dispatch — commits do GITHUB_TOKEN não

@@ -11,7 +11,7 @@ Não é preciso saber nada de informática: basta criar cartões e arrastá-los 
 |---|---|
 | **1. Novos Apoiantes** | Cartões acabados de criar. Ainda não aparecem no site. |
 | **2. Em Validação** | Alguém está a confirmar a informação. Ainda não aparecem no site. |
-| **3. Aprovados** | Aprovado: aparece no site em poucos minutos (até 5). |
+| **3. Aprovados** | Aprovado: aparece no site no dia seguinte (ou quando um administrador pedir a sincronização). |
 | **4. Publicados** | Já está no site. O cartão é movido para aqui automaticamente. |
 | **5. Arquivados** | Sai do site (a imagem é apagada). |
 
@@ -40,7 +40,8 @@ Não é preciso saber nada de informática: basta criar cartões e arrastá-los 
 ## Publicar
 
 1. Um administrador confirma a informação e arrasta o cartão para **3. Aprovados**.
-2. Em poucos minutos o site é atualizado e o cartão passa sozinho para **4. Publicados**,
+2. Na sincronização seguinte (uma vez por dia, ou quando um administrador a pedir) o site é
+   atualizado e o cartão passa sozinho para **4. Publicados**,
    com um comentário "✅ Publicado no site em …".
 3. Se algo estiver errado, o cartão **fica em Aprovados** e recebe um comentário a explicar
    o que falta (por exemplo, um website inválido).
