@@ -1,0 +1,45 @@
+name: Publicar site
+
+# Publica o site no GitHub Pages.
+# - push para main: qualquer alteração humana ou merge de PR.
+# - workflow_dispatch: chamado pela sincronização do Trello (é o único evento
+#   que o GITHUB_TOKEN consegue sempre disparar; commits do GITHUB_TOKEN não
+#   desencadeiam o build do Pages por si só).
+# Requer Settings → Pages → Source = "GitHub Actions".
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Uma publicação de cada vez; a mais recente ganha.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Obter o repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar o Pages
+        uses: actions/configure-pages@v5
+
+      - name: Enviar o site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Publicar
+        id: deployment
+        uses: actions/deploy-pages@v4

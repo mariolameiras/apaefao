@@ -1,46 +1,46 @@
 // Apoiantes: faixa contínua na página inicial e grelha em apoiantes.html.
-// Dados na Google Sheet (folha "apoiantes", lida pelo Apps Script). Só aparecem os que têm "publicar" marcado.
-// Se a Sheet não responder, usa a cópia em data/apoiantes.json.
-// "logo" = imagem enviada pelo apoiante. Sem logo, aparece um ícone do tipo de negócio.
+// Dados em data/apoiantes.json (gerado a partir do Trello por scripts/sincronizar-apoiantes.mjs).
+// Só aparecem os que têm "publicar": true.
+// "logo" = imagem do apoiante. Sem logo, aparece um ícone do tipo de negócio.
+// "logoInteiro": true mostra a imagem inteira (para logótipos). Sem isto, a imagem enche o quadrado.
 // "tamanho" do cartão na página dos apoiantes (quem ofereceu mais, maior):
 //   "grande" (2×2), "alto" (1×2), "largo" (2×1) ou "pequeno".
+// "ordem" = ordem no Trello; "destaque" = etiqueta "Destaque" no Trello.
 
 const ICONES = {
   florista: "🌸", restaurante: "🍽️", cafe: "☕", pastelaria: "🍰", dentista: "🦷", beleza: "💆",
   supermercado: "🛒", loja: "🧴", roupa: "👕", particular: "💛",
-  desporto: "🏋️", barbearia: "💈", cabeleireiro: "💇", diversao: "🐒", tecnologia: "📱",
+  desporto: "🏋️", barbearia: "💈", cabeleireiro: "💇", diversao: "🐒",
+  instituicao: "🏛️", associacao: "🤝", outro: "💛",
 };
 
 function cartaoApoiante(a, i) {
   const el = document.createElement("div");
   el.className = "apoiante";
   const imagem = a.logo
-    ? `<div class="apoiante-img"><img src="${escapar(a.logo)}" alt="${escapar(a.nome)}" loading="lazy"></div>`
+    ? `<div class="apoiante-img"><img src="${escapar(a.logo)}" alt="${escapar(a.nome)}" loading="lazy"${a.logoInteiro ? ' class="inteiro"' : ""}></div>`
     : `<div class="apoiante-img icone" style="--h:${Math.round(i * 137.5) % 360}" aria-hidden="true">${ICONES[a.tipo] || "💛"}</div>`;
-  const link = a.maps_url
-    ? `<a href="${escapar(a.maps_url)}" target="_blank" rel="noopener">${a.maps_url.includes("instagram.com") ? "📷 Ver no Instagram" : "📍 Ver no mapa"}</a>`
-    : "";
-  el.innerHTML = imagem + `<h3>${escapar(a.nome)}</h3>` + link;
+  const links = [];
+  if (a.maps_url) links.push(`<a href="${escapar(a.maps_url)}" target="_blank" rel="noopener">${a.maps_url.includes("instagram.com") ? "📷 Ver no Instagram" : "📍 Ver no mapa"}</a>`);
+  if (a.website && a.website !== a.maps_url) links.push(`<a href="${escapar(a.website)}" target="_blank" rel="noopener">🌐 Website</a>`);
+  const descricao = a.descricao ? `<p class="apoiante-descricao">${escapar(a.descricao)}</p>` : "";
+  el.innerHTML = imagem + `<h3>${escapar(a.nome)}</h3>` + descricao + links.join("");
   return el;
 }
 
-// Lista da Sheet (espera até 6 s); se falhar, a cópia guardada no site.
-async function carregarApoiantes(el) {
-  if (ENDPOINT) {
-    try {
-      const r = await fetch(ENDPOINT + "?acao=apoiantes", { signal: AbortSignal.timeout(6000) });
-      const lista = await r.json();
-      if (Array.isArray(lista) && lista.length) return lista;
-    } catch (e) {}
-  }
-  return carregarJSON("data/apoiantes.json", el);
+// Ordem do site: a ordem do Trello; os destacados primeiro.
+function ordenarApoiantes(lista) {
+  return lista
+    .map((a, i) => [a, i])
+    .sort((x, y) => (Number(y[0].destaque) - Number(x[0].destaque)) || ((x[0].ordem ?? 0) - (y[0].ordem ?? 0)) || x[0].nome.localeCompare(y[0].nome, "pt"))
+    .map(([a]) => a);
 }
 
 // Página inicial: faixa lenta sem fim. Para com o rato em cima, ou com um toque.
 async function faixaApoiantes(el) {
-  const lista = await carregarApoiantes(el);
+  const lista = await carregarJSON("data/apoiantes.json", el);
   if (!lista) return;
-  const publicos = lista.filter(a => a.publicar);
+  const publicos = ordenarApoiantes(lista.filter(a => a.publicar));
   const faixa = document.createElement("div");
   faixa.className = "faixa-apoiantes";
   publicos.forEach((a, i) => faixa.appendChild(cartaoApoiante(a, i)));
@@ -63,14 +63,15 @@ async function faixaApoiantes(el) {
 const CASAS = { grande: 4, alto: 2, largo: 2, pequeno: 1 };   // quantas casas da grelha ocupa cada tamanho
 
 async function grelhaApoiantes(el, contador) {
-  const lista = await carregarApoiantes(el);
+  const lista = await carregarJSON("data/apoiantes.json", el);
   if (!lista) return;
-  const publicos = lista.map((a, i) => [a, i]).filter(([a]) => a.publicar);
+  const publicos = ordenarApoiantes(lista.filter(a => a.publicar)).map((a, i) => [a, i]);
   const tamanho = a => CASAS[a.tamanho] ? a.tamanho : "pequeno";
 
   // Ordem: 1.º grande, os altos com dois pequenos ao lado, os largos, os outros grandes, o resto.
+  // Dentro de cada tamanho mantém-se a ordem do Trello.
   const por = { grande: [], alto: [], largo: [], pequeno: [] };
-  publicos.sort((x, y) => x[0].nome.localeCompare(y[0].nome, "pt")).forEach(p => por[tamanho(p[0])].push(p));
+  publicos.forEach(p => por[tamanho(p[0])].push(p));
   const ordem = [
     ...por.grande.slice(0, 1), ...por.alto, ...por.pequeno.splice(0, 2 * por.alto.length),
     ...por.largo, ...por.grande.slice(1), ...por.pequeno,
@@ -84,6 +85,7 @@ async function grelhaApoiantes(el, contador) {
   // Se a última linha ficar com um buraco, o último cartão estica para o tapar.
   function taparBuraco() {
     const ultimo = el.lastElementChild;
+    if (!ultimo) return;
     ultimo.style.gridColumn = "";
     const colunas = getComputedStyle(el).gridTemplateColumns.split(" ").length;
     const casas = ordem.reduce((s, [a]) => s + CASAS[tamanho(a)], 0);

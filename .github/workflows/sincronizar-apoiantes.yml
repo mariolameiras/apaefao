@@ -1,0 +1,81 @@
+name: Sincronizar apoiantes (Trello)
+
+# A cada 5 minutos (e a pedido): lê os cartões "Aprovados" e "Publicados" do
+# quadro do Trello, atualiza data/apoiantes.json e img/apoiantes/, publica o
+# site e só depois move os cartões novos para "Publicados".
+#
+# Secrets necessários (Settings → Secrets and variables → Actions):
+#   TRELLO_KEY, TRELLO_TOKEN, TRELLO_BOARD_ID
+# Variável opcional: SITE_URL (por omissão https://apaefao.pt)
+
+on:
+  schedule:
+    - cron: "7,17,27,37,47,57 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write   # commit do JSON e das imagens
+  actions: write    # disparar o workflow "Publicar site"
+  pages: read
+
+# Nunca duas sincronizações ao mesmo tempo.
+concurrency:
+  group: sincronizar-apoiantes
+  cancel-in-progress: false
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obter o repositório
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Preparar o Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Testes das regras
+        run: node --test scripts/
+
+      - name: Ler o Trello e atualizar os ficheiros
+        id: sync
+        env:
+          TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+          TRELLO_BOARD_ID: ${{ secrets.TRELLO_BOARD_ID }}
+        run: node scripts/sincronizar-apoiantes.mjs
+
+      - name: Guardar alterações
+        id: commit
+        if: steps.sync.outputs.mudou == 'true'
+        run: |
+          git config user.name "APAEF Apoiantes"
+          git config user.email "apaefao@gmail.com"
+          git add data/apoiantes.json img/apoiantes
+          git commit -m "Apoiantes: sincronização com o Trello ($(date -u +'%Y-%m-%d %H:%M UTC'))"
+          git pull --rebase origin main
+          git push origin main
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Publicar o site
+        if: steps.commit.outputs.sha != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run deploy-pages.yml --ref main
+
+      - name: Confirmar a publicação e mover os cartões para "Publicados"
+        if: steps.commit.outputs.sha != ''
+        env:
+          TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+          TRELLO_BOARD_ID: ${{ secrets.TRELLO_BOARD_ID }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://apaefao.pt' }}
+        run: node scripts/sincronizar-apoiantes.mjs --confirmar
+
+      - name: Avisar sobre cartões com problemas
+        if: steps.sync.outputs.problemas != '0'
+        run: |
+          echo "::warning::${{ steps.sync.outputs.problemas }} cartão(ões) não publicados. Ver o resumo desta execução e os comentários no Trello."
