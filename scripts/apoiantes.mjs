@@ -119,6 +119,9 @@ export function lerCartao(cartao, { etiquetas = [], posicao = 0 } = {}) {
     logo: "",
     publicar: true,
   };
+  // O "website" pode ser um link de mapa/Instagram (o site mostra "Ver no mapa").
+  // Nesse caso guarda-se também em "maps_url", como o site sempre usou.
+  if (website && /google\.com\/maps|instagram\.com/.test(website)) registo.maps_url = website;
   return { registo, avisos };
 }
 

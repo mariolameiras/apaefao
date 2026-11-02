@@ -49,6 +49,11 @@ async function lerQuadro(c) {
 
 // ---------- Imagens ----------
 
+// Lê um JSON; se não existir ou estiver inválido, devolve o valor por omissão.
+function lerJSON(caminho, porOmissao) {
+  try { return JSON.parse(readFileSync(caminho, "utf8")); } catch { return porOmissao; }
+}
+
 // Imagens geridas pelo script: ficheiros listados em data/apoiantes.json com nome
 // "img/apoiantes/<slug>.jpg" (os nomes antigos, tipo "alec.jpg", nunca são apagados).
 function imagensGeridas() {
@@ -96,12 +101,24 @@ async function sincronizar() {
   log(`Trello: ${relevantes.length} cartão(ões) em Aprovados/Publicados.`);
 
   const existentes = imagensGeridas();
+  const anteriores = lerJSON(JSON_APOIANTES, []);   // data/apoiantes.json como está agora
   const usados = new Set();
   const nomesVistos = new Map();   // nome -> quantas vezes aparece
   const lista = [];
   const novos = [];       // cartões que entraram agora (estavam em Aprovados)
   const aCriar = [];      // ficheiros de imagem a criar
   const problemas = [];
+
+  // Nome do ficheiro da imagem: mantém o nome que o site já usa para este apoiante
+  // (ex.: "casa-penetra.jpg"); só os apoiantes novos ganham um nome a partir do nome.
+  const nomeImagem = (nome, id, antiga) => {
+    const atual = antiga?.logo?.startsWith("img/apoiantes/") ? antiga.logo.slice("img/apoiantes/".length) : "";
+    if (atual) return atual;
+    const base = slug(nome);
+    const repetido = nomesVistos.get(base) || 0;
+    nomesVistos.set(base, repetido + 1);
+    return `${base}${repetido ? "-" + identificador(id) : ""}.jpg`;
+  };
 
   for (const cartao of relevantes) {
     const { registo, avisos, erro } = lerCartao(cartao, { etiquetas: quadro.etiquetas, posicao: lista.length });
@@ -113,15 +130,26 @@ async function sincronizar() {
     for (const a of avisos) aviso(`"${registo.nome}": ${a}`);
 
     const anexo = escolherAnexo(cartao);
-    if (anexo) {
-      // Nome de ficheiro a partir do nome; se houver nomes repetidos, acrescenta um sufixo estável.
-      const base = slug(registo.nome);
-      const repetido = nomesVistos.get(base) || 0;
-      nomesVistos.set(base, repetido + 1);
-      const nomeFicheiro = `${base}${repetido ? "-" + identificador(cartao.id) : ""}.jpg`;
+    const antiga = anteriores.find(a => chave(a.nome) === chave(registo.nome));
+    // Mantém o que o site já tem e o Trello não define (tipo, tamanho, imagem antiga).
+    if (antiga) {
+      if (antiga.tipo) registo.tipo = antiga.tipo;
+      if (antiga.tamanho) registo.tamanho = antiga.tamanho;
+    }
+    // Imagem: se o cartão não tem anexo, mantém-se a imagem que já está no site.
+    // Se tem anexo, usa-se o ficheiro existente (mesmo nome) ou cria-se um novo.
+    if (!anexo) {
+      if (cartao.attachments?.length) aviso(`"${registo.nome}": o anexo não é uma imagem; o site vai mostrar a imagem por omissão.`);
+      if (antiga?.logo) {
+        registo.logo = antiga.logo;
+        usados.add(antiga.logo.slice("img/apoiantes/".length));
+      }
+    } else {
+      const nomeFicheiro = nomeImagem(registo.nome, cartao.id, antiga);
       usados.add(nomeFicheiro);
       registo.logo = `img/apoiantes/${nomeFicheiro}`;
-      if (!existentes.has(nomeFicheiro)) {
+      registo.anexo = anexo.id;
+      if (!existsSync(join(IMG_DIR, nomeFicheiro))) {
         try {
           const { dados, tipo } = await descarregarAnexo(cartao.id, anexo, c);
           const img = normalizarImagem(dados, tipo);
@@ -135,8 +163,6 @@ async function sincronizar() {
           continue;
         }
       }
-    } else if (cartao.attachments?.length) {
-      aviso(`"${registo.nome}": o anexo não é uma imagem; o site vai mostrar um ícone.`);
     }
 
     if (cartao.idList === quadro.aprovados.id) novos.push({ id: cartao.id, nome: registo.nome });
@@ -152,17 +178,7 @@ async function sincronizar() {
     log(`[dry-run] Imagens que seriam criadas: ${aCriar.map(i => i.nome).join(", ")}`);
   }
 
-  // Apaga imagens de apoiantes que saíram (só as geradas por este script).
-  const apagar = [...existentes].filter(f => !usados.has(f) && existsSync(join(IMG_DIR, f)));
-  if (!DRY && apagar.length) {
-    for (const f of apagar) unlinkSync(join(IMG_DIR, f));
-    log(`Imagens removidas: ${apagar.join(", ")}`);
-  } else if (DRY && apagar.length) {
-    log(`[dry-run] Imagens que seriam removidas: ${apagar.join(", ")}`);
-  }
-
-  // Escreve o JSON (só se mudou). As imagens novas já foram escritas: se o JSON não mudar,
-  // apaga-as para o repositório ficar igual ao que está publicado.
+  // Escreve o JSON (só se mudou).
   const novoTexto = serializar(lista);
   const antigoTexto = existsSync(JSON_APOIANTES) ? readFileSync(JSON_APOIANTES, "utf8") : "";
   const mudou = novoTexto !== antigoTexto;
@@ -172,11 +188,25 @@ async function sincronizar() {
     writeFileSync(JSON_APOIANTES, novoTexto);
     log(`data/apoiantes.json atualizado (${lista.length} apoiantes).`);
   } else {
-    if (aCriar.length) {
-      for (const { ficheiro } of aCriar) unlinkSync(join(IMG_DIR, ficheiro));
-      log(`Sem alterações no JSON: imagens novas descartadas (${aCriar.map(i => i.ficheiro).join(", ")}).`);
-    }
     log("data/apoiantes.json sem alterações.");
+  }
+
+  // Imagens novas que o JSON não usa (ex.: o JSON não mudou): apagam-se para não ficarem órfãs.
+  // Só se apagam imagens que este script acabou de criar — nunca as antigas do site.
+  const usadosNoJSON = new Set(lista.map(a => String(a.logo || "").replace(/^img\/apoiantes\//, "")));
+  const descartar = aCriar.map(i => i.ficheiro).filter(f => !usadosNoJSON.has(f));
+  if (!DRY && descartar.length) {
+    for (const f of descartar) unlinkSync(join(IMG_DIR, f));
+    log(`Imagens novas descartadas (não usadas): ${descartar.join(", ")}`);
+  }
+
+  // Apaga imagens de apoiantes que saíram (só as geradas por este script).
+  const apagar = [...existentes].filter(f => !usados.has(f) && !usadosNoJSON.has(f) && existsSync(join(IMG_DIR, f)));
+  if (!DRY && apagar.length) {
+    for (const f of apagar) unlinkSync(join(IMG_DIR, f));
+    log(`Imagens removidas: ${apagar.join(", ")}`);
+  } else if (DRY && apagar.length) {
+    log(`[dry-run] Imagens que seriam removidas: ${apagar.join(", ")}`);
   }
 
   if (problemas.length) {
